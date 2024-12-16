@@ -1,0 +1,193 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f0f0f0;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#main-body {
+  width: 90%;
+  max-width: 1000px;
+  height: 80vh;
+  display: flex;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+#hangman-canvas {
+  flex: 1;
+  padding: 20px;
+  border-right: 2px solid #eee;
+}
+
+#hangman-canvas-div {
+  width: 100%;
+  height: 100%;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+}
+
+#game-space {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+#main-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+#life,
+#timer {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#life {
+  background-color: #ff6b6b;
+  color: white;
+}
+
+#timer {
+  background-color: #4dabf7;
+  color: white;
+}
+
+#main-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+#hangman-title {
+  font-size: 2.5em;
+  color: #333;
+  position: absolute;
+  top: 30%;
+}
+
+#category {
+  position: absolute;
+  top: 30%;
+}
+
+#start-button {
+  padding: 15px 40px;
+  font-size: 1.2em;
+  background-color: #51cf66;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  position: absolute;
+  top: 50%;
+}
+
+#answer-letters {
+  position: absolute;
+  top: 50%;
+}
+
+#start-button:hover {
+  transform: scale(1.05);
+}
+
+#main-bottom {
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  #main-body {
+    flex-direction: column;
+    height: auto;
+  }
+
+  #hangman-canvas {
+    border-right: none;
+    border-bottom: 2px solid #eee;
+  }
+  #answer-letters,
+  #start-button,
+  #hangman-title,
+  #category {
+    position: relative;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    /* padding-top: 15px;
+    padding-bottom: 15px; */
+  }
+}
+
+#alphabets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+#alphabets button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  background-color: #e9ecef;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#alphabets button:hover {
+  background-color: #616dd8;
+  scale: 1.1;
+}
+
+.display-none {
+  display: none;
+}
+.display-block {
+  display: block;
+}
+
+.myWord-list {
+  display: inline-block;
+  margin: auto 3px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.my-word {
+  display: flex;
+  justify-content: center;
+}
+
+.right-button {
+  background-color: limegreen !important;
+  color: white;
+}
+
+.wrong-button {
+  background-color: red !important;
+  color: white;
+}
