@@ -1,85 +1,55 @@
+import { initializeDisplay, selectRandomWord, displayWord, createAlphabetList, restartGame, goToStartPage, startTimer, stopTimer } from './system.js';
+import { categoryList } from './constants.js';
+
 //# selectors
+// 공통 요소
 const life = document.querySelector('#life');
 const timer = document.querySelector('#timer');
+const mainCenter = document.querySelector('#main-center');
+
+// 메인화면 요소들
+const mainScreenElements = document.querySelectorAll('.main-screen');
 const title = document.querySelector('#hangman-title');
 const start = document.querySelector('#start-button');
+const instructions = document.querySelector('#instructions');
+
+// 게임화면 요소들
+const gameScreenElements = document.querySelectorAll('.game-screen');
+const restart = document.querySelector('#restart-button');
 const alphabets = document.querySelector('#alphabets');
-const mainCenter = document.querySelector('#main-center');
 const category = document.querySelector('#category');
 const answerLetters = document.querySelector('#answer-letters');
-const instructions = document.querySelector('#instructions');
 const myWord = document.querySelector('#my-word');
-//# main-top
-// 목숨, 남은 시간
+const gameover = document.querySelectorAll('.gameover');
 
-//# main-center
-// 초기값 = h1 제목, button
-// 알파벳 클릭하면 성공시 알파벳 사라짐 변수에 있는 밑줄*모두) -> 글자, 실패시 캔버스 그림 추가,목숨 감소
+let lifeCount = 7;
+let timerCount = 60;
+let initial = true;
+let win = false;
+let currentWord = '';
+
+// 시작 버튼 이벤트 리스너
 start.addEventListener('click', () => {
-  //시작 버튼 누르면 설명서 숨기기
-  instructions.classList.add('display-none');
-  //시작 버튼 누르면 알파벳창 나오기
-  alphabetList();
-  //시작 버튼 누르면 title , 시작버튼 숨기기
-  title.classList.add('display-none');
-  start.classList.add('display-none');
-  //시작 버튼 누르면 종목 , 글자 갯수만큰 밑줄
-  category.classList.remove('display-none');
-  answerLetters.classList.remove('display-none');
-  //랜덤 종목 뽑기 , 종목 표시
-  const categoryKeys = Object.keys(categoryList);
-  const randomCategoryKey =
-    categoryKeys[Math.floor(Math.random() * categoryKeys.length)];
-  category.textContent = randomCategoryKey.toUpperCase();
-  //종목에서 랜덤 value 뽑기
-  const randomList =
-    categoryList[randomCategoryKey][
-      Math.floor(Math.random() * categoryList[randomCategoryKey].length)
-    ];
-  //뽑은 value -> array -> 담을 div 생성 -> forEach 로 각 글자마다 li 생성 textContent로 집어넣기,css flex+스타일링 ->
-  const randUpper = randomList.toUpperCase(); //대문자로
-  const listArray = [...randUpper]; //뽑은 str -> array
-  currentWord = randUpper;
-  listArray.forEach((letters) => {
-    const listDiv = document.createElement('li');
-    myWord.appendChild(listDiv);
-    listDiv.classList.add('myWord-list');
-    if (letters == '_') {
-      listDiv.textContent = ' ';
-    } else {
-      listDiv.textContent = '_';
-    }
-  });
+  // 화면 초기화
+  initializeDisplay(instructions, title, start, category, answerLetters, alphabets);
+  
+  // 알파벳 리스트 초기 생성
+  if (initial) {
+    createAlphabetList(alphabets, checkLetter);
+  }
+  initial = false;
+  
+  // 랜덤 단어 선택 및 저장
+  currentWord = selectRandomWord(categoryList, category);
+  
+  // 단어 표시
+  displayWord(currentWord, myWord);
+  
+  // 타이머 시작
+  timerCount = startTimer(timer, timerCount, checkGameOver);
 });
 
-//알파벳 클릭하면 알파벳에 맞게 글자 변경
-
-//성공시 정답 , 성공했습니다, 처음부터 다시하기 button
-//실패시 정답 , 실패했습니다, 다시 시작 button
-
-//# main-bottom
-let currentWord = '';
-//알파벳 button 추가
-const alphabetList = function () {
-  //알파벳 배열 생성
-  const alphabetArray = Array(26)
-    .fill()
-    .map((v, i) => String.fromCharCode(i + 65));
-  //알파벳 배열 수만큼 버튼 생성
-  alphabetArray.forEach((letter) => {
-    const alphabetButton = document.createElement('button');
-    alphabets.appendChild(alphabetButton);
-    alphabets.classList.add('alphabet-button');
-    alphabetButton.textContent = letter;
-
-    alphabetButton.addEventListener('click', (e) => {
-      alphabetButton.disabled = true;
-      checkLetter(letter, e);
-    });
-  });
-};
-
-//알파벳 체크
+// 알파벳 체크 함수
 const checkLetter = (click, e) => {
   const letterVal = myWord.querySelectorAll('li');
   const wordArray = [...currentWord];
@@ -92,16 +62,82 @@ const checkLetter = (click, e) => {
       isCorrect = true;
     }
   });
-  //버튼 색상 추가
+
   if (isCorrect) {
     clickedButton.classList.add('right-button');
   } else {
     clickedButton.classList.add('wrong-button');
+    lifeCount -= 1;
+    life.innerText = `목숨 : ${lifeCount}`;
   }
 
+  checkGameOver();
   return isCorrect;
 };
 
-//# 잡 계산
+// 승리/패배 체크 함수
+const checkGameOver = () => {
+  // 패배 조건
+  if (lifeCount <= 0 || window.timerCount <= 0) {
+    win = false;
+    endGame();
+    return;
+  }
 
-import { categoryList } from './constants.js';
+  // 승리 조건
+  const letterVal = myWord.querySelectorAll('li');
+  const isComplete = Array.from(letterVal).every(
+    (letter) => letter.textContent !== '_' && letter.textContent !== ' '
+  );
+  
+  if (isComplete) {
+    win = true;
+    endGame();
+  }
+};
+
+// 게임 종료 처리 함수
+const endGame = () => {
+  // 타이머 정지
+  stopTimer();
+  
+  // 알파벳 버튼들 초기화
+  const allAlphabetButtons = document.querySelectorAll('.alphabet-button');
+  allAlphabetButtons.forEach((button) => {
+    button.disabled = false;
+    button.classList.remove('right-button', 'wrong-button');
+  });
+
+  // 버튼 요소 숨김
+  alphabets.classList.add('display-none');
+  
+  // 기존 단어(밑줄) 제거
+  answerLetters.classList.add('display-none');
+  
+  // 목숨, 타이머 초기화
+  timerCount = 60;
+  lifeCount = 7;
+  
+  // 게임오버 메시지 표시 (어차피 하나라 반복문 의미 없기는 함)
+  gameover.forEach(elem => elem.classList.remove('display-none'));
+  //승리 패배 표시
+  category.innerHTML = win 
+    ? `정답입니다!!!<br>정답은 ${currentWord}입니다`
+    : `오답입니다 T.T<br>정답은 ${currentWord}입니다`;
+};
+
+// 다시 플레이 버튼 
+restart.addEventListener('click', () => {
+  restartGame(instructions, title, start, category, answerLetters, alphabets, gameover, myWord);
+  
+  // 새 게임 시작
+  currentWord = selectRandomWord(categoryList, category);
+  displayWord(currentWord, myWord);
+  timerCount = startTimer(timer, timerCount, checkGameOver);
+});
+
+// 시작 화면 버튼 
+startPage.addEventListener('click', () => {
+  timerCount = goToStartPage(instructions, title, start, category, answerLetters, alphabets, gameover, myWord, timer, timerCount);
+});
+

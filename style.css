@@ -17,6 +17,8 @@ body {
   width: 90%;
   max-width: 1000px;
   height: 80vh;
+  min-height: 600px;
+  max-height: 900px;
   display: flex;
   background-color: white;
   border-radius: 20px;
@@ -86,6 +88,7 @@ body {
 
 #category {
   position: absolute;
+  text-align: center;
   top: 30%;
 }
 
@@ -99,9 +102,37 @@ body {
   cursor: pointer;
   transition: transform 0.2s;
   position: absolute;
-  top: 50%;
+  top: 60%;
 }
 
+#end-buttons {
+  display: flex;
+  position: absolute;
+  top: 60%;
+}
+
+#restart-button {
+  padding: 15px 40px;
+  font-size: 1.2em;
+  background-color: #51cf66;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 200px;
+}
+#startPage {
+  padding: 15px 40px;
+  font-size: 1.2em;
+  background-color: #18b6ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 200px;
+}
 #answer-letters {
   position: absolute;
   top: 50%;
@@ -135,8 +166,6 @@ body {
     position: relative;
     margin-top: 30px;
     margin-bottom: 30px;
-    /* padding-top: 15px;
-    padding-bottom: 15px; */
   }
 }
 
@@ -164,7 +193,7 @@ body {
 }
 
 .display-none {
-  display: none;
+  display: none !important;
 }
 .display-block {
   display: block;
@@ -190,4 +219,10 @@ body {
 .wrong-button {
   background-color: red !important;
   color: white;
+}
+
+.gameover {
+  font-size: 15px;
+  font-weight: bold;
+  margin-top: 30px;
 }
