@@ -18,7 +18,7 @@ body {
   max-width: 1000px;
   height: 80vh;
   min-height: 600px;
-  max-height: 900px;
+  max-height: 700px;
   display: flex;
   background-color: white;
   border-radius: 20px;
@@ -36,6 +36,7 @@ body {
   height: 100%;
   background-color: #f8f8f8;
   border-radius: 10px;
+  position: relative;
 }
 
 #game-space {
@@ -107,31 +108,34 @@ body {
 
 #end-buttons {
   display: flex;
+  justify-content: center;
   position: absolute;
   top: 60%;
 }
 
 #restart-button {
-  padding: 15px 40px;
-  font-size: 1.2em;
+  margin-right: 10px;
+  padding: 10px 5px;
+  font-size: 20px;
   background-color: #51cf66;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.2s;
-  width: 200px;
+  width: 150px;
 }
 #startPage {
-  padding: 15px 40px;
-  font-size: 1.2em;
+  margin-left: 10px;
+  padding: 10px 5px;
+  font-size: 20px;
   background-color: #18b6ff;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.2s;
-  width: 200px;
+  width: 150px;
 }
 #answer-letters {
   position: absolute;
@@ -156,8 +160,10 @@ body {
   }
 
   #hangman-canvas {
+    display: none;
     border-right: none;
     border-bottom: 2px solid #eee;
+    height: 300px;
   }
   #answer-letters,
   #start-button,
@@ -166,6 +172,11 @@ body {
     position: relative;
     margin-top: 30px;
     margin-bottom: 30px;
+  }
+
+  .hangman-img {
+    max-width: 60%;
+    max-height: 60%;
   }
 }
 
@@ -222,7 +233,85 @@ body {
 }
 
 .gameover {
-  font-size: 15px;
+  font-size: 20px;
   font-weight: bold;
   margin-top: 30px;
+  text-align: center;
+}
+
+.hangman-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;
+  max-width: 80%;
+  max-height: 80%;
+}
+
+#gallows {
+  height: 90%;
+  max-height: 90%;
+}
+
+#head, #body {
+  width: 22%;
+  height: 22%;
+}
+
+#leftarm, #rightarm{
+  width: 12%;
+  height: 12%;
+}
+
+#leftleg, #rightleg {
+  width: 8%;
+  height: 12%;
+}
+
+#head {
+  position: absolute;
+  top: 25%;
+  left: 60%;
+  transform: translate(-50%, -50%);
+}
+
+#body {
+  position: absolute;
+  top: 46%;
+  left: 60%;
+  transform: translate(-50%, -50%);
+}
+
+#leftarm {
+  position: absolute;
+  top: 44%;
+  left: 47%;
+  transform: translate(-50%, -50%);
+}
+
+#rightarm {
+  position: absolute;
+  top: 44%;
+  left: 73%;
+  transform: translate(-50%, -50%);
+}
+
+#leftleg {
+  position: absolute;
+  top: 62%;
+  left: 56%;
+  transform: translate(-50%, -50%);
+}
+
+#rightleg {
+  position: absolute;
+  top: 62%;
+  left: 64%;
+  transform: translate(-50%, -50%);
+}
+
+#instructions{
+  word-break: keep-all
 }

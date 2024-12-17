@@ -1,149 +1,182 @@
-let currentCountdown = null;
+import { GAME_CONSTANTS, MESSAGES } from './constants.js';
 
-// 화면 요소 초기화
-export const initializeDisplay = (
-  instructions,
-  title,
-  start,
-  category,
-  answerLetters,
-  alphabets
-) => {
-  instructions.classList.add('display-none');
-  title.classList.add('display-none');
-  start.classList.add('display-none');
-  category.classList.remove('display-none');
-  answerLetters.classList.remove('display-none');
-  alphabets.classList.remove('display-none');
-};
-
-// 랜덤 카테고리와 단어 선택
-export const selectRandomWord = (categoryList, category) => {
-  const categoryKeys = Object.keys(categoryList);
-  const randomCategoryKey =
-    categoryKeys[Math.floor(Math.random() * categoryKeys.length)];
-  category.textContent = randomCategoryKey.toUpperCase();
-
-  const randomList =
-    categoryList[randomCategoryKey][
-      Math.floor(Math.random() * categoryList[randomCategoryKey].length)
-    ];
-
-  return randomList.toUpperCase();
-};
-
-// 단어 표시
-export const displayWord = (word, myWord) => {
-  const listArray = [...word];
-  listArray.forEach((letters) => {
-    const listDiv = document.createElement('li');
-    myWord.appendChild(listDiv);
-    listDiv.classList.add('myWord-list');
-    listDiv.textContent = letters === '_' ? ' ' : '_';
-  });
-};
-
-// 알파벳 리스트 생성
-export const createAlphabetList = (alphabets, checkLetter) => {
-  // 알파벳 배열 생성
-  const alphabetArray = Array(26)
-    .fill()
-    .map((v, i) => String.fromCharCode(i + 65));
-  // 알파벳 버튼 생성
-  alphabetArray.forEach((letter) => {
-    const alphabetButton = document.createElement('button');
-    alphabets.appendChild(alphabetButton);
-    alphabetButton.classList.add('alphabet-button');
-    alphabetButton.textContent = letter;
-    alphabetButton.addEventListener('click', (e) => {
-      alphabetButton.disabled = true;
-      checkLetter(letter, e);
-    });
-  });
-};
-
-// 다시 플레이 함수
-export const restartGame = (
-  instructions,
-  title,
-  start,
-  category,
-  answerLetters,
-  alphabets,
-  gameover,
-  myWord
-) => {
-  // 게임오버 화면 숨기기
-  gameover.forEach((elem) => elem.classList.add('display-none'));
-
-  // 기존 단어 제거
-  myWord.innerHTML = '';
-
-  // 게임 화면 초기화
-  initializeDisplay(
-    instructions,
-    title,
-    start,
-    category,
-    answerLetters,
-    alphabets
-  );
-};
-
-// 시작 화면으로 돌아가기 함수
-export const goToStartPage = (
-  instructions,
-  title,
-  start,
-  category,
-  answerLetters,
-  alphabets,
-  gameover,
-  myWord,
-  timer,
-  timerCount
-) => {
-  // 게임오버 화면 숨기기
-  gameover.forEach((elem) => elem.classList.add('display-none'));
-
-  // 기존 단어 제거
-  myWord.innerHTML = '';
-
-  // 알파벳 숨기기
-  alphabets.classList.add('display-none');
-
-  // 카테고리와 답안 칸 숨기기
-  category.classList.add('display-none');
-  answerLetters.classList.add('display-none');
-
-  // 시작화면 요소들 보이기
-  instructions.classList.remove('display-none');
-  title.classList.remove('display-none');
-  start.classList.remove('display-none');
-
-  //타이머 초기화
-  timer.innerText = `남은 시간 : 60`;
-};
-
-// 타이머 시작
-export const startTimer = (timer, timerCount, lifeCount, checkGameOver) => {
-  timer.innerText = `남은 시간 : ${timerCount}`;
-  currentCountdown = setInterval(() => {
-    timerCount--;
-    timer.innerText = `남은 시간 : ${timerCount}`;
-
-    if (timerCount <= 0 || lifeCount <= 0) {
-      clearInterval(currentCountdown);
-      checkGameOver();
-      return;
-    }
-  }, 1000);
-};
-
-// 타이머 정지 함수 추가
-export const stopTimer = () => {
-  if (currentCountdown) {
-    clearInterval(currentCountdown);
-    currentCountdown = null;
+class MainScreen {
+  constructor() {
+    this.instructions = document.querySelector('#instructions');
+    this.title = document.querySelector('#hangman-title');
+    this.startButton = document.querySelector('#start-button');
   }
-};
+
+  show() {
+    [this.instructions, this.title, this.startButton].forEach(el => 
+      el.classList.remove('display-none')
+    );
+  }
+
+  hide() {
+    [this.instructions, this.title, this.startButton].forEach(el => 
+      el.classList.add('display-none')
+    );
+  }
+}
+
+class GameScreen {
+  constructor(wordList) {
+    this.initializeElements();
+    this.categoryList = wordList;
+    this.resetGame();
+  }
+
+  initializeElements() {
+    this.category = document.querySelector('#category');
+    this.answerLetters = document.querySelector('#answer-letters');
+    this.alphabets = document.querySelector('#alphabets');
+    this.myWord = document.querySelector('#my-word');
+    this.timer = document.querySelector('#timer');
+    this.life = document.querySelector('#life');
+    this.gameoverMessage = document.querySelector('#gameoverMessage');
+    this.endButtons = document.querySelector('#end-buttons');
+    this.hangmanParts = ['gallows', 'head', 'body', 'leftarm', 'rightarm', 'leftleg', 'rightleg']
+      .map(id => document.querySelector(`#${id}`));
+  }
+
+  show() {
+    [this.category, this.answerLetters, this.alphabets].forEach(el => 
+      el.classList.remove('display-none')
+    );
+  }
+
+  hide() {
+    [this.category, this.answerLetters, this.alphabets, 
+    this.gameoverMessage, this.endButtons].forEach(el => 
+      el.classList.add('display-none')
+    );
+    this.hideAllHangmanImages();
+  }
+
+  resetGame() {
+    this.timerCount = GAME_CONSTANTS.INITIAL_TIME;
+    this.lifeCount = GAME_CONSTANTS.INITIAL_LIVES;
+    this.updateDisplays();
+    this.hideAllHangmanImages();
+  }
+
+  initializeGame() {
+    this.gameoverMessage.classList.add('display-none');
+    this.endButtons.classList.add('display-none');
+    [this.category, this.answerLetters, this.alphabets].forEach(el => 
+      el.classList.remove('display-none')
+    );
+    this.resetGame();
+    this.currentWord = this.selectRandomWord();
+    this.displayWord();
+    this.createAlphabetButtons();
+    this.startTimer();
+  }
+
+  selectRandomWord() {
+    const categories = Object.keys(this.categoryList);
+    const category = categories[Math.floor(Math.random() * categories.length)];
+    const words = this.categoryList[category];
+    
+    this.category.textContent = category.toUpperCase();
+    return words[Math.floor(Math.random() * words.length)].toUpperCase();
+  }
+
+  displayWord() {
+    this.myWord.innerHTML = [...this.currentWord].map(() => 
+      '<li class="myWord-list">_</li>'
+    ).join('');
+  }
+
+  createAlphabetButtons() {
+    this.alphabets.innerHTML = Array.from({length: 26}, (_, i) => 
+      `<button class="alphabet-button">${String.fromCharCode(65 + i)}</button>`
+    ).join('');
+
+    this.alphabets.querySelectorAll('button').forEach(button => 
+      button.addEventListener('click', () => this.checkLetter(button))
+    );
+  }
+
+  checkLetter(button) {
+    const letter = button.textContent;
+    button.disabled = true;
+    
+    const letterFound = [...this.currentWord].some((char, idx) => {
+      if (char === letter) {
+        this.myWord.children[idx].textContent = letter;
+        return true;
+      }
+      return false;
+    });
+
+    button.classList.add(letterFound ? 'right-button' : 'wrong-button');
+    
+    if (!letterFound) {
+      this.lifeCount--;
+      this.updateDisplays();
+      this.updateHangmanImage();
+    }
+
+    this.checkGameOver();
+  }
+
+  updateHangmanImage() {
+    if (this.hangmanParts[GAME_CONSTANTS.INITIAL_LIVES - this.lifeCount - 1]) {
+      this.hangmanParts[GAME_CONSTANTS.INITIAL_LIVES - this.lifeCount - 1]
+        .classList.remove('display-none');
+    }
+  }
+
+  hideAllHangmanImages() {
+    this.hangmanParts.forEach(part => part.classList.add('display-none'));
+  }
+
+  startTimer() {
+    this.updateDisplays();
+    this.currentCountdown = setInterval(() => {
+      this.timerCount--;
+      this.updateDisplays();
+      if (this.timerCount <= 0) {
+        this.stopTimer();
+        this.checkGameOver();
+      }
+    }, 1000);
+  }
+
+  stopTimer() {
+    clearInterval(this.currentCountdown);
+  }
+
+  updateDisplays() {
+    this.life.innerText = `목숨 : ${this.lifeCount}`;
+    this.timer.innerText = `남은 시간 : ${this.timerCount}`;
+  }
+
+  checkGameOver() {
+    const isComplete = [...this.myWord.children]
+      .every(letter => letter.textContent !== '_');
+    
+    if (isComplete || this.lifeCount <= 0 || this.timerCount <= 0) {
+      this.endGame(isComplete);
+    }
+  }
+
+  endGame(isWin) {
+    this.stopTimer();
+    [this.alphabets, this.answerLetters, this.category].forEach(el => 
+      el.classList.add('display-none')
+    );
+    
+    this.gameoverMessage.classList.remove('display-none');
+    this.gameoverMessage.style.whiteSpace = 'pre-line';
+    this.gameoverMessage.textContent = isWin 
+      ? MESSAGES.WIN(this.currentWord)
+      : MESSAGES.LOSE(this.currentWord);
+    
+    this.endButtons.classList.remove('display-none');
+  }
+}
+
+export { MainScreen, GameScreen };
