@@ -7,8 +7,8 @@ const GAME_CONSTANTS = {
 };
 
 const MESSAGES = {
-  WIN: (word) => `정답입니다!!!\n정답은 ${word}입니다`,
-  LOSE: (word) => `오답입니다 T.T\n정답은 ${word}입니다`
+  WIN: (word) => `정답입니다!!!\n정답은 ${word.replace(/_/g, ' ')} 입니다`,
+  LOSE: (word) => `오답입니다 T.T\n정답은 ${word.replace(/_/g, ' ')} 입니다`
 };
 
 const categoryList = {

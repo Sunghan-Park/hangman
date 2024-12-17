@@ -84,8 +84,8 @@ class GameScreen {
   }
 
   displayWord() {
-    this.myWord.innerHTML = [...this.currentWord].map(() => 
-      '<li class="myWord-list">_</li>'
+    this.myWord.innerHTML = [...this.currentWord].map(char => 
+      `<li class="myWord-list">${char === '_' ? ' ' : '_'}</li>`
     ).join('');
   }
 
@@ -103,12 +103,12 @@ class GameScreen {
     const letter = button.textContent;
     button.disabled = true;
     
-    const letterFound = [...this.currentWord].some((char, idx) => {
+    let letterFound = false;
+    [...this.currentWord].forEach((char, idx) => {
       if (char === letter) {
         this.myWord.children[idx].textContent = letter;
-        return true;
+        letterFound = true;
       }
-      return false;
     });
 
     button.classList.add(letterFound ? 'right-button' : 'wrong-button');
